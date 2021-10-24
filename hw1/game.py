@@ -6,6 +6,9 @@ from collections import deque
 
 
 def clear():
+    """Функция для очистки консоли
+    """
+
     # for windows
     if name == 'nt':
         _ = system('cls')
@@ -15,34 +18,31 @@ def clear():
 
 
 class TicTacGame:
-    """
+    """Класс игры крестики-нолики
     """
 
     _turn = 0  # Идекс хода
-    _maxTurns = 0  # Максимальный индекс хода
 
-    X = "X"
-    O = "O"
-
-    _gameInfo = ""
+    X = "X"  # Первый игрок играет Х
+    O = "O"  # Второй игрок играет O
 
     _stackError: deque[str] = deque()
 
     def __init__(self):
-        """
-        """
-        n = 3
-        
+        n = 3  # размер поля 
+
         self._n = n
-        self._maxTurns = n * n
+        self._maxTurns = n * n  # Максимальный индекс хода
         self._board = [' ' for _ in range(n * n)]  # Создаем поле размером n*n
-        self._gameInfo = f"""Поля пронумерованны с 0 до {n*n} начиная с левого верхнего края.
-В [] указан игрок который должен сходить
-----------------------------------------------------------------"""
+
+        self._gameInfo = f"Поля пронумерованны с 0 до {n*n} начиная с левого верхнего края. \
+                            \nВ [] указан игрок который должен сходить \
+                            \n----------------------------------------------------------------"
 
     def _print_board(self):
         """Выводит доску в консоль
         """
+
         board = ""
         for i in range(self._n * self._n):
             board += f" {self._board[i]} |"
@@ -52,8 +52,9 @@ class TicTacGame:
         print(board)
 
     def _print_info(self):
-        """Вводить информацию об игре, инструкцию
+        """Вводить информацию об игре
         """
+
         print(self._gameInfo)
         while len(self._stackError):
             print(self._stackError.pop())
@@ -62,7 +63,8 @@ class TicTacGame:
         """Проверка победителя
 
         Если хотя бы одна строка, столбец или диагональ 
-        заполнена одинаковым элементом вернется true
+        заполнена одинаковым элементом вернется True
+        иначе False
         """
 
         n = self._n
@@ -93,7 +95,8 @@ class TicTacGame:
 
     def _valid_input(self) -> Union[int, None]:
         """Возвращает валидное значение полученное с консоли
-        если было получено не валидное значение возбуждается исключение
+
+        Если было получено не валидное значение возбуждается исключение
 
         Исключения:
         -----------
@@ -111,7 +114,6 @@ class TicTacGame:
         """
 
         player = self.X if self._turn % 2 == 0 else self.O
-        value = ""
         value = int(input(f"[{player}] Введите номер клетки для вставки: "))
 
         if value <= 0 and value > self._n * self._n:
@@ -127,9 +129,10 @@ class TicTacGame:
     def run(self):
         """Запуск цикла игры
         """
+
         while True:
+            # Игра продолжается пока нет победителя
             try:
-                # Игра продолжается пока нет победителя
                 clear()
                 self._print_info()
                 self._print_board()
