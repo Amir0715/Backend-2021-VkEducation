@@ -1,9 +1,8 @@
 from os import system, name
 from typing import Union
-
-from exceptions import InvalidInputError, CellOccupiedError
 from collections import deque
 
+from hw1.exceptions import InvalidInputError, CellOccupiedError
 
 def clear():
     """Функция для очистки консоли
@@ -15,8 +14,6 @@ def clear():
     # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
-
-
 class TicTacGame:
     """Класс игры крестики-нолики
     """
@@ -26,16 +23,16 @@ class TicTacGame:
     X = "X"  # Первый игрок играет Х
     O = "O"  # Второй игрок играет O
 
-    _stackError: deque[str] = deque()
+    _stack_error: deque[str] = deque()
 
     def __init__(self):
-        n = 3  # размер поля 
+        n = 3  # размер поля
 
         self._n = n
-        self._maxTurns = n * n  # Максимальный индекс хода
+        self._max_turns = n * n  # Максимальный индекс хода
         self._board = [' ' for _ in range(n * n)]  # Создаем поле размером n*n
 
-        self._gameInfo = f"Поля пронумерованны с 0 до {n*n} начиная с левого верхнего края. \
+        self._game_info = f"Поля пронумерованны с 1 до {n*n} начиная с левого верхнего края. \
                             \nВ [] указан игрок который должен сходить \
                             \n----------------------------------------------------------------"
 
@@ -55,14 +52,13 @@ class TicTacGame:
         """Вводить информацию об игре
         """
 
-        print(self._gameInfo)
-        while len(self._stackError):
-            print(self._stackError.pop())
+        print(self._game_info)
+        while len(self._stack_error):
+            print(self._stack_error.pop())
 
     def _check_winner(self) -> bool:
         """Проверка победителя
-
-        Если хотя бы одна строка, столбец или диагональ 
+        Если хотя бы одна строка, столбец или диагональ
         заполнена одинаковым элементом вернется True
         иначе False
         """
@@ -100,31 +96,44 @@ class TicTacGame:
 
         Исключения:
         -----------
-
-        InvalidInputError: если значение больше допустимых
-
-        CellOccupiedError: если клетка была занята
-
         ValueError: если было введено не число
-
         EOFError: если пользователь нажал ctrl+d
-
         KeyboardInterrupt: если пользователь нажал ctrl+c
 
         """
 
         player = self.X if self._turn % 2 == 0 else self.O
-        value = int(input(f"[{player}] Введите номер клетки для вставки: "))
+        value = input(f"[{player}] Введите номер клетки для вставки: ")
+        if self._validation(value):
+            return int(value)
 
-        if value <= 0 and value > self._n * self._n:
+        return None
+
+    def _validation(self, value: str) -> bool:
+        """Проверка значения на валидность
+
+        Args:
+            value (str): значение
+
+        Raises:
+            InvalidInputError: если значение больше допустимых
+            CellOccupiedError: если клетка была уже занята
+
+        Returns:
+            bool: валидно или нет
+        """
+
+        intvalue = int(value)
+
+        if intvalue <= 0 or intvalue > self._n * self._n:
             raise InvalidInputError(
                 f"Значение должно > 0 и <= {self._n * self._n}!")
 
-        if self._board[value-1] != ' ':
+        if self._board[intvalue - 1] != ' ':
             raise CellOccupiedError(
-                f"Клетка под номером {value} занята игроком [{self._board[value-1]}]")
+                f"Клетка под номером {intvalue} занята игроком [{self._board[intvalue - 1]}]")
 
-        return value
+        return True
 
     def run(self):
         """Запуск цикла игры
@@ -137,14 +146,15 @@ class TicTacGame:
                 self._print_info()
                 self._print_board()
 
-                if self._turn >= self._maxTurns:
+                if self._turn >= self._max_turns:
                     print("Ничья!")
                     break
 
                 value = self._valid_input()
                 if value is not None:
-                    self._board[value -
-                                1] = self.X if self._turn % 2 == 0 else self.O
+                    self._board[value - 1] = (
+                        self.X if self._turn % 2 == 0 else self.O
+                    )
                     self._turn += 1
 
                     if self._check_winner():
@@ -156,13 +166,13 @@ class TicTacGame:
                         break
 
             except CellOccupiedError as e:
-                self._stackError.append(str(e))
+                self._stack_error.append(str(e))
 
             except InvalidInputError as e:
-                self._stackError.append(str(e))
+                self._stack_error.append(str(e))
 
             except ValueError:
-                self._stackError.append(f"Значение должно быть числом! ")
+                self._stack_error.append("Значение должно быть числом!")
 
             except EOFError:
                 print("\nПока!")
