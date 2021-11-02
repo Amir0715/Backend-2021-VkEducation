@@ -1,5 +1,5 @@
 
-class CostumList(list):
+class CustomList(list):
     """Класс расширения списка
     """
 
@@ -7,38 +7,26 @@ class CostumList(list):
     def __add__(self, value: list[int]):
         arrmax = self if len(self) >= len(value) else value
         arrmin = self if len(self) < len(value) else value
-        res = CostumList(arrmax)
+        res = CustomList(arrmax)
 
         for i in range(len(arrmin)):
             res[i] = res[i] + arrmin[i]
         return res
 
     def __radd__(self, value: list[int]):
-        arrmax = self if len(self) >= len(value) else value
-        arrmin = self if len(self) < len(value) else value
-        res = CostumList(arrmax)
-
-        for i in range(len(arrmin)):
-            res[i] = res[i] + arrmin[i]
-        return res
+        return self.__add__(value)
 
     def __sub__(self, value: list[int]):
         arrmax = self if len(self) >= len(value) else value
         arrmin = self if len(self) < len(value) else value
-        res = CostumList(arrmax)
+        res = CustomList(arrmax)
 
         for i in range(len(arrmin)):
             res[i] = res[i] - arrmin[i]
         return res
 
     def __rsub__(self, value: list[int]):
-        arrmax = self if len(self) >= len(value) else value
-        arrmin = self if len(self) < len(value) else value
-        res = CostumList(arrmax)
-
-        for i in range(len(arrmin)):
-            res[i] = res[i] - arrmin[i]
-        return res
+        return self.__sub__(value)
 
     def __lt__(self, value: list[int]) -> bool:
         return sum(self) < sum(value)
@@ -57,17 +45,3 @@ class CostumList(list):
 
     def __ge__(self, value: list[int]) -> bool:
         return sum(self) >= sum(value)
-
-
-if __name__ == "__main__":
-    a = CostumList([1, 2, 3, 4])
-    b = CostumList([1, 2, 3, 4])
-    d = [2] * 10
-    c = a + b
-    c = b + a
-    # print(a, "+", b, "=", c)
-    # print(sum(d), sum(b), d > b)
-    print(sum(a), sum(b), a == b)
-    print(sum(d), sum(b), d == b)
-
-

@@ -2,7 +2,7 @@ class CustomMeta(type):
     def __new__(mcs, name, bases, attrs, **extra_kwargs):
         new_attrs = {}
         for attr, val in attrs.items():
-            if not attr.startswith("__"):
+            if not (attr.startswith("__") and attr.endswith("__")):
                 new_attrs[f"custom_{attr}"] = val
             else:
                 new_attrs[attr] = val

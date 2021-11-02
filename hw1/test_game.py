@@ -1,8 +1,7 @@
 import unittest
-from unittest.mock import patch
 
-from hw1.game import TicTacGame
-from hw1.exceptions import CellOccupiedError, InvalidInputError
+from game import TicTacGame
+from exceptions import CellOccupiedError, InvalidInputError
 
 
 class TestTicTacGame(unittest.TestCase):

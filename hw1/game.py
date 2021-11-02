@@ -2,7 +2,7 @@ from os import system, name
 from typing import Union
 from collections import deque
 
-from hw1.exceptions import InvalidInputError, CellOccupiedError
+from exceptions import InvalidInputError, CellOccupiedError
 
 def clear():
     """Функция для очистки консоли
@@ -14,6 +14,7 @@ def clear():
     # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
+        
 class TicTacGame:
     """Класс игры крестики-нолики
     """
