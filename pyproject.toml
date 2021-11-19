@@ -6,6 +6,7 @@ authors = ["amir kamolov <kamolov.amir2000@yandex.ru>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
