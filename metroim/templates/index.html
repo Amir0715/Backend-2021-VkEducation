@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<header>
+    <h1>Metroim</h1>
+</header>
+<main>
+    <h2>Линии метро:</h2>
+    <pre>{{lines | pprint}}</pre>
+</main>
+{% endblock body %}
