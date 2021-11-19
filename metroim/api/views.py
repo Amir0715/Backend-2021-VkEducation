@@ -2,6 +2,7 @@ import json
 from django.http import JsonResponse
 from django.http.response import HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 def get_line(line_id=None):
     # TODO: добавить в базу данных 
@@ -19,23 +20,17 @@ def get_line(line_id=None):
             return data
 
 @csrf_exempt
+@require_GET
 def lines(request):
-    if request.method == 'GET':
-        return JsonResponse(get_line())
-    else: 
-        return HttpResponseNotAllowed(['GET']) 
+    return JsonResponse(get_line())
 
 @csrf_exempt
+@require_GET
 def line_detail(request, line_id):
-    if request.method == 'GET':
-        return JsonResponse(get_line(line_id))
-    else: 
-        return HttpResponseNotAllowed(['GET'])
+    return JsonResponse(get_line(line_id))
 
 @csrf_exempt
+@require_POST
 def line_add(request):
-    # CSRF токена нет в ответном куках
-    if request.method == 'POST':
-        return JsonResponse({"message":"Линия успешно создана!"})
-    else: 
-        return HttpResponseNotAllowed(['POST'])
+    return JsonResponse({"message":"Линия успешно создана!"})
+    

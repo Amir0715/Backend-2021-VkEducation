@@ -1,4 +1,4 @@
 __pycache__
 .vscode
 *.sqlite3
-metroim/*/migrations/??*_??*.py
+# metroim/*/migrations/??*_??*.py
