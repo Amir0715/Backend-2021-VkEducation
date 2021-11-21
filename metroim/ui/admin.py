@@ -8,7 +8,6 @@ from ui.models import City, Line, Station
 class CityAdmin(admin.ModelAdmin):
     list_display = [
         "name",
-        "slug",
         "count_of_lines"
     ]
 
