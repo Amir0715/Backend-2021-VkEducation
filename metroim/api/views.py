@@ -20,50 +20,82 @@ def line_detail(request, line_id):
     try:
         line = Line.objects.get(id=line_id)
     except Line.DoesNotExist:
+        # Если объект не найден
         return JsonResponse({"error": f"Линии с id {line_id} нет в базе!"}, status=404)
 
     if request.method == "GET":
         return JsonResponse({
             'id': line.id,
             'name': line.name,
+            'hex_color': line.hex_color,
             'stations': list(line.stations.all().values())
         })
 
     elif request.method == "DELETE":
         line.delete()
         return JsonResponse({"message": "Линия успешно удалена!"})
-    
 
+    elif request.method == "PUT":
+        # Если объект существует, то нужно изменить объект
+        if not request.body:
+            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
 
+        data = json.loads(request.body)
+        if {'name', 'hex_color', 'city_id'} != set(data.keys()):
+            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
 
-@csrf_exempt
-@require_POST
-def line_add(request):
-    data = json.loads(request.body)
-    if len(list(set(['name', 'hex_color', 'city_id']) & set(data.keys()))) == 3:
+        line.name = data['name']
+        line.hex_color = data['hex_color']
+
         try:
             city = City.objects.get(id=data['city_id'])
         except City.DoesNotExist:
             return JsonResponse({"error": f"Города с id {data['city_id']} нет в базе!"}, status=400)
 
-        line = Line.objects.create(name=data['name'],
-                            hex_color=data['hex_color'],
-                            city=city)
-
+        line.city = city
+        line.save()
         return JsonResponse({
-            "message": "Линия успешно создана!", 
-            "data": {
-                "id": line.id,
-                "name": line.name,
-                "hex_color": line.hex_color,
-                "city": {
-                    "id": city.id,
-                    "name": city.name,                     
-                }
-            }
+            'id': line.id,
+            'name': line.name,
+            'hex_color': line.hex_color,
+            'city': {
+                'id': line.city.id,
+                'name': line.city.name
+            },
+            'stations': list(line.stations.all().values())
         })
 
-    return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
+@csrf_exempt
+@require_POST
+def line_add(request):
+    if not request.body:
+        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+    data = json.loads(request.body)
+    if {'name', 'hex_color', 'city_id'} != set(data.keys()):
+        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
+    try:
+        city = City.objects.get(id=data['city_id'])
+    except City.DoesNotExist:
+        return JsonResponse({"error": f"Города с id {data['city_id']} нет в базе!"}, status=400)
+
+    line = Line.objects.create(name=data['name'],
+                               hex_color=data['hex_color'],
+                               city=city)
+
+    return JsonResponse({
+        "message": "Линия успешно создана!",
+        "data": {
+            "id": line.id,
+            "name": line.name,
+            "hex_color": line.hex_color,
+            "city": {
+                "id": city.id,
+                "name": city.name,
+            }
+        }
+    })
 
 
 @csrf_exempt
@@ -74,7 +106,7 @@ def cities(request):
 
 
 @csrf_exempt
-@require_http_methods(['DELETE', 'GET'])
+@require_http_methods(['DELETE', 'GET', 'PUT'])
 def city_detail(request, city_id):
     try:
         city = City.objects.get(id=city_id)
@@ -83,31 +115,49 @@ def city_detail(request, city_id):
 
     if request.method == "GET":
         JsonResponse({
-            'id': city.id, 
-            'name': city.name, 
+            'id': city.id,
+            'name': city.name,
             'lines': list(city.lines.all().values())})
 
     elif request.method == "DELETE":
         city.delete()
         return JsonResponse({"message": "Город успешно удален!"})
 
+    elif request.method == "PUT":
+        # Если объект существует, то нужно изменить объект
+        if not request.body:
+            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+        data = json.loads(request.body)
+        if 'name' not in data:
+            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
+        city.name = data['name']
+        city.save()
+        return JsonResponse({
+            'id': city.id,
+            'name': city.name,
+            'lines': list(city.lines.all().values())
+        })
+
 
 @csrf_exempt
 @require_POST
 def city_add(request):
-    data = json.loads(request.body)
-    if 'name' in data:
-        city = City.objects.create(name=data['name'])
-        return JsonResponse(
-            {
-                "message": "Город успешно создан!", "data": {
-                    "id": city.id,
-                    "name": city.name
-                }
-            }
-        )
+    if not request.body:
+        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
 
-    return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+    data = json.loads(request.body)
+    if 'name' not in data:
+        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
+    city = City.objects.create(name=data['name'])
+    return JsonResponse({
+        "message": "Город успешно создан!",
+        "data": {
+            "id": city.id,
+            "name": city.name
+        }
+    })
 
 
 @csrf_exempt
@@ -118,7 +168,7 @@ def stations(request):
 
 
 @csrf_exempt
-@require_http_methods(['DELETE', 'GET'])
+@require_http_methods(['DELETE', 'GET', 'PUT'])
 def station_detail(request, station_id):
     try:
         station = Station.objects.get(id=station_id)
@@ -127,61 +177,103 @@ def station_detail(request, station_id):
 
     if request.method == "GET":
         return JsonResponse({
-                'id': station.id,
-                'name': station.name,
-                'order': station.order,
-                'latitude': station.latitude,
-                'longitude': station.longitude,
-                'line': {
-                    'id': station.line.id,
-                    'name': station.line.name,
-                    'hex_color': station.line.hex_color,
-                    'city': {
-                        'id': station.line.city.id,
-                        'name': station.line.city.name,
-                    }
+            'id': station.id,
+            'name': station.name,
+            'order': station.order,
+            'latitude': station.latitude,
+            'longitude': station.longitude,
+            'line': {
+                'id': station.line.id,
+                'name': station.line.name,
+                'hex_color': station.line.hex_color,
+                'city': {
+                    'id': station.line.city.id,
+                    'name': station.line.city.name,
                 }
-            })
+            }
+        })
 
     elif request.method == "DELETE":
         station.delete()
         return JsonResponse({"message": "Станция успешно удалена!"})
 
-@csrf_exempt
-@require_POST
-def station_add(request):
-    data = json.loads(request.body)
-    if len(list(set(['name', 'order', 'latitude', 'longitude', 'line_id']) & set(data.keys()))) == 5:
+    elif request.method == "PUT":
+        if not request.body:
+            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+        data = json.loads(request.body)
+        if {'name', 'order', 'latitude', 'longitude', 'line_id'} != set(data.keys()):
+            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
         try:
             line = Line.objects.get(id=data['line_id'])
         except Line.DoesNotExist:
             return JsonResponse({"error": f"Линии с id {data['line_id']} нет в базе!"}, status=404)
-        
-        station = Station.objects.create(
-            name=data['name'],
-            order=data['order'],
-            latitude=data['latitude'],
-            longitude=data['longitude'],
-            line=line
-        )
+
+        station.name = data['name']
+        station.order = data['order']
+        station.latitude = data['latitude']
+        station.longitude = data['longitude']
+        station.line = line
+        station.save()
+
         return JsonResponse({
-                "message": "Станция успешно создана!", 
-                "data": {
-                    "id": station.id,
-                    "name": station.name,
-                    "order": station.order,
-                    "latitude": station.latitude,
-                    "longitude": station.longitude,
-                    "line": {
-                        "id": line.id,
-                        "name": line.name,
-                        "hex_color": line.hex_color,
-                        "city": {
+            "message": "Станция успешно изменена!",
+            "data": {
+                "id": station.id,
+                "name": station.name,
+                "order": station.order,
+                "latitude": station.latitude,
+                "longitude": station.longitude,
+                "line": {
+                    "id": line.id,
+                    "name": line.name,
+                    "hex_color": line.hex_color,
+                    "city": {
                             "id": line.city.id,
                             "name": line.city.name,
-                        }
-                    }
+                            }
                 }
-            })
+            }
+        })
 
-    return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
+@csrf_exempt
+@require_POST
+def station_add(request):
+    if not request.body:
+        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+    data = json.loads(request.body)
+    if {'name', 'order', 'latitude', 'longitude', 'line_id'} != set(data.keys()):
+        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
+
+    try:
+        line = Line.objects.get(id=data['line_id'])
+    except Line.DoesNotExist:
+        return JsonResponse({"error": f"Линии с id {data['line_id']} нет в базе!"}, status=404)
+
+    station = Station.objects.create(
+        name=data['name'],
+        order=data['order'],
+        latitude=data['latitude'],
+        longitude=data['longitude'],
+        line=line
+    )
+    return JsonResponse({
+        "message": "Станция успешно создана!",
+        "data": {
+            "id": station.id,
+            "name": station.name,
+            "order": station.order,
+            "latitude": station.latitude,
+            "longitude": station.longitude,
+            "line": {
+                "id": line.id,
+                "name": line.name,
+                "hex_color": line.hex_color,
+                "city": {
+                        "id": line.city.id,
+                        "name": line.city.name,
+                }
+            }
+        }
+    })
