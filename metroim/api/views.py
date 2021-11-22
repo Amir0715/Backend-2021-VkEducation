@@ -2,10 +2,9 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from api.decorators import require_body
 from ui.models import City, Line, Station
 
-
-# TODO: добавить логику редактирование объектов
 
 @csrf_exempt
 @require_GET
@@ -16,6 +15,7 @@ def lines(request):
 
 @csrf_exempt
 @require_http_methods(['DELETE', 'GET', 'PUT'])
+@require_body('PUT', ['name', 'hex_color', 'city_id'])
 def line_detail(request, line_id):
     try:
         line = Line.objects.get(id=line_id)
@@ -37,13 +37,7 @@ def line_detail(request, line_id):
 
     elif request.method == "PUT":
         # Если объект существует, то нужно изменить объект
-        if not request.body:
-            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
         data = json.loads(request.body)
-        if {'name', 'hex_color', 'city_id'} != set(data.keys()):
-            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
         line.name = data['name']
         line.hex_color = data['hex_color']
 
@@ -68,13 +62,9 @@ def line_detail(request, line_id):
 
 @csrf_exempt
 @require_POST
+@require_body('POST', ['name', 'hex_color', 'city_id'])
 def line_add(request):
-    if not request.body:
-        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
     data = json.loads(request.body)
-    if {'name', 'hex_color', 'city_id'} != set(data.keys()):
-        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
     try:
         city = City.objects.get(id=data['city_id'])
     except City.DoesNotExist:
@@ -107,6 +97,7 @@ def cities(request):
 
 @csrf_exempt
 @require_http_methods(['DELETE', 'GET', 'PUT'])
+@require_body('PUT', ['name'])
 def city_detail(request, city_id):
     try:
         city = City.objects.get(id=city_id)
@@ -125,12 +116,7 @@ def city_detail(request, city_id):
 
     elif request.method == "PUT":
         # Если объект существует, то нужно изменить объект
-        if not request.body:
-            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
         data = json.loads(request.body)
-        if 'name' not in data:
-            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
         city.name = data['name']
         city.save()
         return JsonResponse({
@@ -142,14 +128,9 @@ def city_detail(request, city_id):
 
 @csrf_exempt
 @require_POST
+@require_body('POST', ['name'])
 def city_add(request):
-    if not request.body:
-        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
     data = json.loads(request.body)
-    if 'name' not in data:
-        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
     city = City.objects.create(name=data['name'])
     return JsonResponse({
         "message": "Город успешно создан!",
@@ -169,6 +150,7 @@ def stations(request):
 
 @csrf_exempt
 @require_http_methods(['DELETE', 'GET', 'PUT'])
+@require_body('PUT', ['name', 'order', 'latitude', 'longitude', 'line_id'])
 def station_detail(request, station_id):
     try:
         station = Station.objects.get(id=station_id)
@@ -198,12 +180,7 @@ def station_detail(request, station_id):
         return JsonResponse({"message": "Станция успешно удалена!"})
 
     elif request.method == "PUT":
-        if not request.body:
-            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
         data = json.loads(request.body)
-        if {'name', 'order', 'latitude', 'longitude', 'line_id'} != set(data.keys()):
-            return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
         try:
             line = Line.objects.get(id=data['line_id'])
         except Line.DoesNotExist:
@@ -239,13 +216,9 @@ def station_detail(request, station_id):
 
 @csrf_exempt
 @require_POST
+@require_body('PUT', ['name', 'order', 'latitude', 'longitude', 'line_id'])
 def station_add(request):
-    if not request.body:
-        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
     data = json.loads(request.body)
-    if {'name', 'order', 'latitude', 'longitude', 'line_id'} != set(data.keys()):
-        return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-
     try:
         line = Line.objects.get(id=data['line_id'])
     except Line.DoesNotExist:
@@ -273,7 +246,7 @@ def station_add(request):
                 "city": {
                         "id": line.city.id,
                         "name": line.city.name,
-                }
+                        }
             }
         }
     })
