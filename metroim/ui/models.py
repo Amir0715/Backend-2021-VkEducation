@@ -4,12 +4,6 @@ from django.template.defaultfilters import slugify
 
 class City(models.Model):
     name = models.CharField('Название города', max_length=64)
-    slug = models.SlugField('Slug города', unique=True)
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
 
 class Line(models.Model):
     name = models.CharField('Название линии', max_length=64)

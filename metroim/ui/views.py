@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from api.views import get_line
+
+from ui.models import Line
 
 def index(request): 
-    return render(request, 'index.html', {'lines': get_line()})
+    return render(request, 'index.html', {'lines': Line.objects.all()})
