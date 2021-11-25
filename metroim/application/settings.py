@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'ui',
     'user',
     'rest_framework',
-
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -122,6 +122,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Metroim API',
+    'DESCRIPTION': 'Schema for metroim api',
+    'VERSION': '1.0.0',
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    # OTHER SETTINGS
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

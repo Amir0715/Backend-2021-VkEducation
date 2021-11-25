@@ -11,7 +11,6 @@ class Line(models.Model):
     hex_color = models.CharField('Название линии', max_length=6)
     city = ForeignKey('City', verbose_name='Город', on_delete=models.CASCADE, related_name='lines')
     
-
 class Station(models.Model):
     name = models.CharField('Название станции', max_length=64)
     order = models.PositiveSmallIntegerField('Порядок')
