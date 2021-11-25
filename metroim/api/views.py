@@ -105,7 +105,7 @@ def city_detail(request, city_id):
         return JsonResponse({"error": f"Города с id {city_id} нет в базе!"}, status=404)
 
     if request.method == "GET":
-        JsonResponse({
+        return JsonResponse({
             'id': city.id,
             'name': city.name,
             'lines': list(city.lines.all().values())})
@@ -216,7 +216,7 @@ def station_detail(request, station_id):
 
 @csrf_exempt
 @require_POST
-@require_body('PUT', ['name', 'order', 'latitude', 'longitude', 'line_id'])
+@require_body('POST', ['name', 'order', 'latitude', 'longitude', 'line_id'])
 def station_add(request):
     data = json.loads(request.body)
     try:
