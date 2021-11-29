@@ -8,8 +8,7 @@ from django.contrib.auth.models import (
 class UserManager(BaseUserManager):
     """
     """
-
-    def create_user(self, email, password, **kwargs):
+    def _create_user(self, email, password, **kwargs):
         if not email:
             raise ValueError("Users must have an Email")
 
@@ -18,8 +17,10 @@ class UserManager(BaseUserManager):
 
         user.set_password(password)
         user.save()
-
         return user
+
+    def create_user(self, email, password=None, **kwargs):
+        return self._create_user(self, email, password, kwargs)
 
     def create_superuser(self, email, password, **kwargs):
         """
