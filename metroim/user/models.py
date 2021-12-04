@@ -52,6 +52,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+    
+    favorite_stations = models.ManyToManyField(to='ui.Station', related_name='users')
 
     def __str__(self):
         """
