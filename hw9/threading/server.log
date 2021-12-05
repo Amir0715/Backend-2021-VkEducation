@@ -1,0 +1,2 @@
+2021-12-05 16:19:30,577 - server - DEBUG - Create server instanse with host localhost port 8080
+2021-12-05 16:19:30,577 - server - DEBUG - Server loop running in thread: Thread-1
