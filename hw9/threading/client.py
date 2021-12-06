@@ -1,17 +1,29 @@
+from queue import Queue
 import socket
 import sys
+import time
 
-HOST, PORT = "localhost", 8080
-data = " ".join(sys.argv[1:])
+HOST, PORT = "localhost", 8000
+q = Queue()
+
+def fetch():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+    data = input("Client: ")
+    if data == "q":
+        exit()
+    else:
+        sock.sendall(bytes(data+"\n", 'utf-8'))
+        rcv = str(sock.recv(1024), "utf-8")[1:]
+        if rcv:
+            q.put(rcv)
+    sock.close()
 
 # Create a socket (SOCK_STREAM means a TCP socket)
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    # Connect to server and send data
-    sock.connect((HOST, PORT))
-    sock.sendall(bytes(data + "\n", "utf-8"))
-
-    # Receive data from the server and shut down
-    received = str(sock.recv(1024), "utf-8")
-
-print("Sent:     {}".format(data))
-print("Received: {}".format(received))
+if __name__ == "__main__":
+    fetch()
+    while True:
+        if q.not_empty:
+            print(q.get())
+        else: 
+            break
