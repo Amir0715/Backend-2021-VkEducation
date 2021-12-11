@@ -1,8 +1,22 @@
+from datetime import datetime
 from rest_framework import serializers
 from ui.models import City, Line, Station
+from api.tasks import send_email
 
 
-class StationSerializer(serializers.ModelSerializer):
+class EmailSendMixin(serializers.Serializer):
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        text = '[{}]\nБыл создан объект модели {} - {}'.format(
+            datetime.now().isoformat(),
+            self.Meta.model,
+            instance.name)
+        send_email.delay(subject='Новый объект', text=text)
+        print("SENDING EMIAL")
+        return instance
+
+
+class StationSerializer(EmailSendMixin, serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs['latitude'] < -180 or attrs['latitude'] > 180:
@@ -18,7 +32,7 @@ class StationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'order', 'latitude', 'longitude', 'line')
 
 
-class LineSerializer(serializers.ModelSerializer):
+class LineSerializer(EmailSendMixin, serializers.ModelSerializer):
     stations = StationSerializer(many=True, read_only=True)
 
     def validate(self, attrs):
@@ -37,7 +51,7 @@ class LineSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'hex_color', 'city', 'stations')
 
 
-class CitySerializer(serializers.ModelSerializer):
+class CitySerializer(EmailSendMixin, serializers.ModelSerializer):
     lines = LineSerializer(many=True, read_only=True)
 
     class Meta:

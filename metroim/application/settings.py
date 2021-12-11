@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9_f&($prc%toj!w%kqk53z0p#n^q)oecu0xoeymf_i$$mx8j6z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -39,14 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     "corsheaders",
+    'rest_framework',
+    'drf_spectacular',
+    'social_django',
 
     # my apps
     'api',
     'ui',
     'user',
-    'rest_framework',
-    'drf_spectacular',
-    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -147,6 +147,37 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': r'/api/',
     # OTHER SETTINGS
 }
+
+# celery conf
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = 'redis://localhost:6390'
+
+# django-db означает что будет подлючена оснавная бд
+CELERY_RESULT_BACKEND = 'redis://localhost:6390'
+
+CELERY_BEAT_SCHEDULE = {
+    'tracker_checking': {
+        'task': 'api.tasks.save_user_count',
+        'schedule': 600,
+        'args': (),
+    },
+    # 'dayly-check': {
+    #     'task': 'tracker.tasks.increment',
+    #     'args': (20,),
+    #     'schedule': 25,
+    #     # 'options': {'queue': 'queue2'}
+    # },
+}
+
+# email 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
