@@ -17,7 +17,6 @@ class City(models.Model):
         verbose_name_plural = "Города"
 
 
-
 class Line(models.Model):
     name = models.CharField('Название линии', max_length=64)
     # В будущем создать кастомное поле для работы с hex-числом
@@ -53,3 +52,22 @@ class Station(models.Model):
     class Meta:
         verbose_name = "Станция"
         verbose_name_plural = "Станции"
+
+    @property
+    def location_field_indexing(self):
+        """Location for indexing.
+
+        Used in Elasticsearch indexing/tests of `geo_distance` native filter.
+        """
+        return {
+            'lat': self.latitude,
+            'lon': self.longitude,
+        }
+
+    @property
+    def line_field_indexing(self):
+        return self.line.name
+
+    @property
+    def city_field_indexing(self):
+        return self.line.city.name

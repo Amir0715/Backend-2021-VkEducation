@@ -42,14 +42,24 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'social_django',
-
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
     # my apps
     'api',
     'ui',
     'user',
+
+    # debug 
+    'debug_toolbar',
+
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -171,13 +181,18 @@ CELERY_BEAT_SCHEDULE = {
     # },
 }
 
-# email 
+# email
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

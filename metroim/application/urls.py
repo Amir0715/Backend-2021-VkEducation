@@ -8,5 +8,6 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('api-auth/', include('rest_framework.urls')),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
+    path('__debug__/', include('debug_toolbar.urls')),
     path('', include('ui.urls')),
 ]

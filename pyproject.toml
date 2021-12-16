@@ -5,7 +5,7 @@ description = "package for homeworks vk.education"
 authors = ["amir kamolov <kamolov.amir2000@yandex.ru>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.11"
 gunicorn = "^20.1.0"
 Django = "^3.2.9"
 django-cors-headers = "^3.10.0"
@@ -18,10 +18,15 @@ social-auth-app-django = "^5.0.0"
 celery = "^5.2.1"
 redis = "^4.0.2"
 flower = "^1.0.0"
+django-elasticsearch-dsl = "^7.2.1"
+django-elasticsearch-dsl-drf = "^0.22.2"
+numpy = "^1.21.4"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
 pylint = "^2.11.1"
+django-debug-toolbar = "^3.2.3"
+django-elasticsearch-debug-toolbar = "^2.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
