@@ -26,3 +26,4 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=False)
     def me(self, request):
         return Response(self.serializer_class(request.user).data)
+

@@ -23,13 +23,12 @@ from django_elasticsearch_dsl_drf.filter_backends import (
 from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
 from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
 
-from ui.documents import StationDocument
-from ui.serializers import StationDocumentSerializer
+from user.documents import UserDocument
+from user.serializers import UserSerializer
 
-
-class StationDocumentView(BaseDocumentViewSet):
-    document = StationDocument
-    serializer_class = StationDocumentSerializer
+class UserDocumentView(BaseDocumentViewSet):
+    document = UserDocument
+    serializer_class = UserSerializer
     pagination_class = PageNumberPagination
 
     lookup_field = 'id'
@@ -43,9 +42,9 @@ class StationDocumentView(BaseDocumentViewSet):
 
     # Define search fields
     search_fields = (
-        'name',
-        'city',
-        'line',
+        'email',
+        'first_name',
+        'last_name',
     )
 
     filter_fields = {
@@ -62,36 +61,6 @@ class StationDocumentView(BaseDocumentViewSet):
                 LOOKUP_QUERY_LTE,
             ],
         },
-        'name': 'name.raw',
-        'line': 'line.raw',
-        'city': 'city.raw',
-    }
-
-    suggester_fields = {
-        'name_suggest': {
-            'field': 'name.suggest',
-            'suggesters': [
-                SUGGESTER_COMPLETION,
-            ],
-        },
-        'city_suggest': {
-            'field': 'city.suggest',
-            'suggesters': [
-                SUGGESTER_COMPLETION,
-            ],
-        },
-        'line_suggest': {
-            'field': 'line.suggest',
-            'suggesters': [
-                SUGGESTER_COMPLETION,
-            ],
-        }
-    }
-
-    geo_spatial_filter_fields = {
-        'location': {
-            'lookups': [
-                LOOKUP_FILTER_GEO_DISTANCE,
-            ],
-        },
+        'first_name': 'first_name',
+        'last_name': 'last_name'
     }
