@@ -24,11 +24,11 @@ from django_elasticsearch_dsl_drf.viewsets import BaseDocumentViewSet
 from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
 
 from user.documents import UserDocument
-from user.serializers import UserSerializer
+from user.serializers import UserDocumentSerializer
 
 class UserDocumentView(BaseDocumentViewSet):
     document = UserDocument
-    serializer_class = UserSerializer
+    serializer_class = UserDocumentSerializer
     pagination_class = PageNumberPagination
 
     lookup_field = 'id'

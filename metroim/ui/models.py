@@ -1,6 +1,5 @@
 from django.db import models
-from django.db.models.fields.related import ForeignKey, ManyToManyField
-from django.template.defaultfilters import slugify
+from django.db.models.fields.related import ForeignKey
 
 
 class City(models.Model):

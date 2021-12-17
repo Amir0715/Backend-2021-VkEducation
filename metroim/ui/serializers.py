@@ -1,5 +1,3 @@
-import json
-
 from rest_framework import serializers
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from ui.documents import StationDocument

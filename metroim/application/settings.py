@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9_f&($prc%toj!w%kqk53z0p#n^q)oecu0xoeymf_i$$mx8j6z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get("DEBUG", 1)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -108,11 +108,11 @@ WSGI_APPLICATION = 'application.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'metroim',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.environ.get("DB_NAME", BASE_DIR / "db.sqlite3"),
+        'USER': os.environ.get("DB_USER", "user"),
+        'PASSWORD': os.environ.get("DB_PASS", "password"),
+        'HOST': os.environ.get("DB_HOST", "localhost"),
+        'PORT': os.environ.get("DB_PORT", "5432"),
     }
 }
 
@@ -173,12 +173,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 600,
         'args': (),
     },
-    # 'dayly-check': {
-    #     'task': 'tracker.tasks.increment',
-    #     'args': (20,),
-    #     'schedule': 25,
-    #     # 'options': {'queue': 'queue2'}
-    # },
 }
 
 # email
@@ -190,7 +184,7 @@ EMAIL_USE_TLS = True
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'localhost:9200'
+        'hosts': os.environ.get('ELASTICSEARCH_DSL_HOST', 'localhost:9200')
     },
 }
 
@@ -213,13 +207,15 @@ USE_TZ = True
 
 
 # Добавляем путь к статике
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = '/static/'
+# metroim/ui/static/imgs/1.jpg
+# metroim/ui/static/imgs/2.jpg
+# metroim/ui/static/imgs/3.jpg
+# metroim/ui/static/imgs/4.jpg
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static") # metroim/ui/static/
+STATIC_URL = '/static/' # localhost:8000/static/1.jpg
 STATICFILES_DIRS = [
-    'css',
-    'js',
-    ("css", os.path.join(STATIC_ROOT, "css")),
-    ("js", os.path.join(STATIC_ROOT, "js")),
+    ("css", os.path.join(STATIC_ROOT, "css")), # metroim/ui/static/css/style.css
 ]
 
 # Default primary key field type

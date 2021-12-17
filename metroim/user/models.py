@@ -20,7 +20,8 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **kwargs):
-        return self._create_user(self, email, password, kwargs)
+        print(email, password, kwargs)
+        return self._create_user(email, password, **kwargs)
 
     def create_superuser(self, email, password, **kwargs):
         """
@@ -54,6 +55,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
     
     favorite_stations = models.ManyToManyField(to='ui.Station', related_name='users')
+    
+    @property
+    def favorite_stations_indexing(self):
+        data = self.favorite_stations.all()
+        res = []
+        for x in data:
+            res.append({
+                "id":x.id, 
+                "email":x.email, 
+                "first_name":x.first_name, 
+                "last_name":x.last_name
+                })
 
     def __str__(self):
         """
