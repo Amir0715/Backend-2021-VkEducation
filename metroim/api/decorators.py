@@ -1,5 +1,5 @@
-from functools import wraps
 import json
+from functools import wraps
 from json.decoder import JSONDecodeError
 from typing import List
 
@@ -23,7 +23,7 @@ def require_body(method: str, require_keys: List[str]):
                 # проверяем на наличия для указоного метода
                 if not request.body:
                     return JsonResponse({"error": "Недостаточно ключей"}, status=400)
-                    
+
                 try:
                     data = json.loads(request.body)
                 except JSONDecodeError:
@@ -39,3 +39,6 @@ def require_body(method: str, require_keys: List[str]):
             return func(request, *args, **kwargs)
         return inner
     return decorator
+
+
+

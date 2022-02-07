@@ -8,8 +8,7 @@ from django.contrib.auth.models import (
 class UserManager(BaseUserManager):
     """
     """
-
-    def create_user(self, email, password, **kwargs):
+    def _create_user(self, email, password, **kwargs):
         if not email:
             raise ValueError("Users must have an Email")
 
@@ -18,8 +17,11 @@ class UserManager(BaseUserManager):
 
         user.set_password(password)
         user.save()
-
         return user
+
+    def create_user(self, email, password=None, **kwargs):
+        print(email, password, kwargs)
+        return self._create_user(email, password, **kwargs)
 
     def create_superuser(self, email, password, **kwargs):
         """
@@ -51,6 +53,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+    
+    favorite_stations = models.ManyToManyField(to='ui.Station', related_name='users')
+    
+    @property
+    def favorite_stations_indexing(self):
+        data = self.favorite_stations.all()
+        res = []
+        for x in data:
+            res.append({
+                "id":x.id, 
+                "email":x.email, 
+                "first_name":x.first_name, 
+                "last_name":x.last_name
+                })
 
     def __str__(self):
         """
