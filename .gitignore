@@ -1,0 +1,7 @@
+__pycache__
+.vscode
+*.sqlite3
+# metroim/*/migrations/??*_??*.py
+*.log
+*.rdb
+metroim/celerybeat-schedule

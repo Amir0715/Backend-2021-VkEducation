@@ -1,0 +1,52 @@
+version: '3'
+
+volumes:
+  static_volume:
+  db-volume:
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: djangodb
+      POSTGRES_USER: djangouser
+      POSTGRES_PASSWORD: root123
+    expose:
+      - 5432
+
+  elasticsearch:
+    image: elasticsearch:7.14.2
+    depends_on:
+      - postgres
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  django:
+    build:
+      context: . 
+      dockerfile: django/Dockerfile
+    depends_on:
+      - postgres
+      - elasticsearch
+    env_file:
+      - ./.env.prod
+    volumes:
+      - static_volume:/app/metroim/static
+    expose:
+      - 8000
+
+  nginx:
+    build: nginx/
+    ports:
+      - 80:80
+    depends_on:
+      - django
+    volumes:
+      - static_volume:/app/metroim/static
+
